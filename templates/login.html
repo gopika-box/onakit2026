@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | VYMA</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-green: #1a3a32;
+            --accent-gold: #e6a026;
+            --cream-bg: #fdfaf1;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+
+            /* 🔥 Strong branded background */
+            background:
+                radial-gradient(circle at top left, rgba(26,58,50,0.2), transparent),
+                radial-gradient(circle at bottom right, rgba(230,160,38,0.15), transparent),
+                var(--cream-bg);
+
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 🔥 MAIN CARD */
+        .login-container {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(14px);
+
+            padding: 50px 40px;
+            width: 100%;
+            max-width: 420px;
+
+            border-radius: 24px;
+            box-shadow: 0 30px 60px rgba(26,58,50,0.15);
+            text-align: center;
+
+            border: 1px solid rgba(255,255,255,0.6);
+        }
+
+        /* 🔥 LOGO */
+        .logo img {
+            height: 90px;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            font-family: 'Playfair Display', serif;
+            color: var(--primary-green);
+            font-size: 26px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        /* INPUT */
+        .input-group {
+            text-align: left;
+            margin-bottom: 18px;
+        }
+
+        .input-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--primary-green);
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            border: 2px solid #f1f5f9;
+            background: #f8fafc;
+            font-size: 15px;
+            transition: 0.3s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--accent-gold);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(230,160,38,0.15);
+        }
+
+        /* 🔥 BUTTON */
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #1a3a32, #234d43);
+            border: none;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-top: 10px;
+
+            transition: 0.3s;
+            box-shadow: 0 12px 25px rgba(26,58,50,0.25);
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 30px rgba(26,58,50,0.3);
+        }
+
+        /* ERROR */
+        .error {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 10px;
+            background: #ffecec;
+            color: #b91c1c;
+            font-size: 14px;
+        }
+
+        /* BACK */
+        .back-home {
+            display: inline-block;
+            margin-top: 25px;
+            font-size: 14px;
+            text-decoration: none;
+            color: #94a3b8;
+        }
+
+        .back-home:hover {
+            color: var(--accent-gold);
+        }
+
+        /* MOBILE */
+        @media (max-width: 500px) {
+            .login-container {
+                margin: 20px;
+                padding: 40px 25px;
+            }
+
+            .logo img {
+                height: 75px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="login-container">
+
+        <!-- 🔥 LOGO -->
+        <div class="logo">
+            <img src="{% static 'images/logo.png' %}" alt="VYMA">
+        </div>
+
+        <h2>Member Portal</h2>
+        <p class="subtitle">Sign in to track your contributions and kit status.</p>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="input-group">
+                <label>Username</label>
+                <input type="text" name="username" placeholder="Enter username" required>
+            </div>
+
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" name="password" placeholder="••••••••" required>
+            </div>
+
+            <button type="submit" class="login-btn">Sign In</button>
+        </form>
+
+        {% if error %}
+            <div class="error">
+                {{ error }}
+            </div>
+        {% endif %}
+
+        <a class="back-home" href="/">← Back to Home</a>
+
+    </div>
+
+</body>
+</html>

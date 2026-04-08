@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+.glass-panel {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    max-width: 600px;
+    margin: auto;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.form-group { margin-bottom: 20px; }
+
+.form-group label {
+    font-weight: 600;
+    color: #1a3a32;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+}
+
+.password-wrapper {
+    position: relative;
+}
+
+.toggle-eye {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+
+.btn-save {
+    background: #1a3a32;
+    color: white;
+    padding: 15px;
+    border-radius: 10px;
+    width: 100%;
+    font-weight: 700;
+    border: none;
+}
+
+.btn-save:hover {
+    background: #2c6b4f;
+}
+
+/* 🔥 POPUP */
+.popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.popup-box {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    width: 300px;
+}
+
+.copy-btn {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background: #e6a026;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+</style>
+
+<div class="glass-panel">
+    <h2 style="text-align:center;">
+        {% if edit_user %}Edit Member{% else %}Add Member{% endif %}
+    </h2>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label>Person ID</label>
+            <input class="form-control" readonly
+                   value="{% if edit_user %}{{ edit_user.person_id }}{% else %}{{ next_id }}{% endif %}">
+        </div>
+
+        <div class="form-group">
+            <label>Username</label>
+            <input id="usernamePreview" class="form-control" readonly>
+        </div>
+
+        <div class="form-group">
+            <label>Name</label>
+            <input name="first_name" id="nameInput" class="form-control"
+                   value="{% if edit_user %}{{ edit_user.first_name }}{% endif %}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Role</label>
+            <select name="role" class="form-control">
+                <option value="user">User</option>
+                <option value="coordinator">Coordinator</option>
+                <option value="admin">Admin</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Area</label>
+            <select name="area" class="form-control">
+                {% for area in areas %}
+                <option value="{{ area.id }}">{{ area.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Password</label>
+            <div class="password-wrapper">
+                <input type="password" name="password" id="passwordField" class="form-control" required>
+                <span class="toggle-eye" onclick="togglePassword()">👁</span>
+            </div>
+        </div>
+
+        <button class="btn-save">Save</button>
+    </form>
+</div>
+
+<!-- 🔥 POPUP -->
+{% if created_username %}
+<div class="popup" id="popup">
+    <div class="popup-box">
+        <h3>User Created 🎉</h3>
+        <p><b>Username:</b> {{ created_username }}</p>
+        <p><b>Password:</b> {{ created_password }}</p>
+
+        <button class="copy-btn" onclick="copyText('{{ created_username }}')">Copy Username</button>
+        <button class="copy-btn" onclick="copyText('{{ created_password }}')">Copy Password</button>
+
+        <br><br>
+        <button onclick="closePopup()">Close</button>
+    </div>
+</div>
+{% endif %}
+
+<script>
+const nameInput = document.getElementById("nameInput");
+const usernamePreview = document.getElementById("usernamePreview");
+
+const personId = "{% if edit_user %}{{ edit_user.person_id }}{% else %}{{ next_id }}{% endif %}";
+
+function updateUsername() {
+    let name = nameInput.value.toLowerCase().replace(/\s+/g, '');
+    let digits = personId.replace(/\D/g, '');
+    let lastTwo = digits.slice(-2);
+
+    usernamePreview.value = name + lastTwo;
+}
+
+nameInput.addEventListener("input", updateUsername);
+updateUsername();
+
+function togglePassword() {
+    let p = document.getElementById("passwordField");
+    p.type = p.type === "password" ? "text" : "password";
+}
+
+function copyText(text) {
+    navigator.clipboard.writeText(text);
+    alert("Copied!");
+}
+
+function closePopup() {
+    document.getElementById("popup").style.display = "none";
+}
+</script>
+
+{% endblock %}

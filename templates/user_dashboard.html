@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member Dashboard | VYMA</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-green: #1a3a32;
+            --accent-gold: #e6a026;
+            --cream-bg: #fdfaf1;
+            --success-green: #2d6a4f;
+            --error-red: #e11d48;
+            --glass-white: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--cream-bg);
+            color: var(--primary-green);
+            line-height: 1.6;
+        }
+
+        /* --- DASHBOARD HEADER --- */
+        .dashboard-header {
+            background: white;
+            padding: 6px 10%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-green);
+            text-decoration: none;
+        }
+
+        .logout-btn {
+            text-decoration: none;
+            color: #64748b;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+
+        .logout-btn:hover { 
+            color: var(--error-red);
+            background: #fff1f2;
+        }
+
+        /* --- MAIN CONTENT --- */
+        .main-container {
+            max-width: 900px;
+            margin: 2.5rem auto;
+            padding: 0 20px;
+        }
+
+        .welcome-section { margin-bottom: 2rem; }
+        .welcome-section h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            margin-bottom: 5px;
+            color: var(--primary-green);
+        }
+        .welcome-section p { color: #64748b; font-size: 16px; }
+
+        /* --- TOTAL SUMMARY CARD (PREMIUM) --- */
+        .summary-card {
+            background: linear-gradient(135deg, var(--primary-green) 0%, #2d6a4f 100%);
+            color: white;
+            padding: 2.5rem;
+            border-radius: 24px;
+            margin-bottom: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            box-shadow: 0 20px 40px rgba(26, 58, 50, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        .summary-main {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .summary-info .label-tiny {
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 11px;
+            opacity: 0.8;
+            font-weight: 700;
+        }
+
+        .summary-info h2 {
+            font-size: 56px;
+            margin: 5px 0;
+            letter-spacing: -2px;
+            font-weight: 800;
+        }
+
+        .member-tag {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 12px;
+            display: inline-block;
+            backdrop-filter: blur(5px);
+        }
+
+        /* Glassmorphism Goal Tracker */
+        .goal-glass-box {
+            background: var(--glass-white);
+            backdrop-filter: blur(12px);
+            border-radius: 20px;
+            padding: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            min-width: 300px;
+            flex-grow: 1;
+            max-width: 400px;
+        }
+
+        .goal-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 18px;
+        }
+
+        .goal-item { display: flex; flex-direction: column; gap: 4px; }
+        .goal-item span { font-size: 10px; text-transform: uppercase; opacity: 0.7; letter-spacing: 1px; }
+        .goal-item strong { font-size: 20px; }
+
+        .goal-divider {
+            width: 1px;
+            background: rgba(255,255,255,0.2);
+            margin: 0 15px;
+        }
+
+        .progress-bar-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .progress-bar-bg {
+            flex-grow: 1;
+            background: rgba(255,255,255,0.2);
+            height: 10px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            background: var(--accent-gold);
+            height: 100%;
+            border-radius: 10px;
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .percent-label {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--accent-gold);
+        }
+
+        .gold-text { color: var(--accent-gold); }
+
+        .goal-celebration {
+            background: rgba(230, 160, 38, 0.15);
+            border: 1px solid var(--accent-gold);
+            color: var(--accent-gold);
+            padding: 12px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* --- PAYMENT HISTORY SECTION --- */
+        .payment-section {
+            background: white;
+            border-radius: 24px;
+            padding: 35px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+        }
+
+        .payment-section h4 { 
+            margin-top: 0;
+            margin-bottom: 1.5rem; 
+            font-size: 18px; 
+            font-weight: 700;
+            color: var(--primary-green);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo-image {
+            height:65px;
+            width: auto;
+            object-fit:contain;
+        }
+
+        table { width: 100%; border-collapse: collapse; }
+        th { 
+            text-align: left; 
+            color: #94a3b8; 
+            font-size: 12px; 
+            text-transform: uppercase; 
+            letter-spacing: 1.5px; 
+            padding-bottom: 20px; 
+            border-bottom: 1px solid #f1f5f9;
+        }
+        td { padding: 20px 0; border-bottom: 1px solid #f8fafc; font-weight: 500; font-size: 15px; }
+        
+        .month-name { color: var(--primary-green); font-weight: 700; }
+        .amount-paid { color: var(--success-green); font-weight: 600; }
+
+        /* Status Tags */
+        .status-pill {
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .paid-tag {
+            background: #ecfdf5;
+            color: #065f46;
+        }
+
+        .notpaid-tag {
+            background: #fff1f2;
+            color: var(--error-red);
+        }
+
+        @media (max-width: 768px) {
+            .summary-main { justify-content: center; text-align: center; }
+            .goal-glass-box { min-width: 100%; }
+            .summary-info h2 { font-size: 48px; }
+            .dashboard-header { padding: 1rem 5%; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="dashboard-header">
+        <a href="/" class="logo" style="display:flex; align-items:center; gap:10px;">
+    <img src="{% static 'images/logo.png' %}" alt="VYMA" class="logo-image">
+</a>
+        <a href="/login/" class="logout-btn">Logout</a>
+    </header>
+
+    <main class="main-container">
+        
+        <div class="welcome-section">
+            <h1>Namaskaram, {{ request.user.first_name|default:"Member" }}!</h1>
+            <p>Welcome to your personal Onam Kit contribution tracker.</p>
+        </div>
+
+        <div class="summary-card">
+            <div class="summary-main">
+                <div class="summary-info">
+                    <h3 class="label-tiny">Total Contribution</h3>
+                    <h2 class="amount-hero">₹{{ total_paid }}</h2>
+                    <div class="member-tag">
+                        ✨ Member ID: #{{ request.user.username }}
+                    </div>
+                </div>
+                
+                <div class="goal-glass-box">
+                    <div class="goal-stats">
+                        <div class="goal-item">
+                            <span>Target Goal</span>
+                            <strong>₹3500</strong>
+                        </div>
+                        <div class="goal-divider"></div>
+                        <div class="goal-item">
+                            <span>Balance</span>
+                            <strong class="gold-text">₹{{ remaining_amount }}</strong>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-bar-wrapper">
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" style="width: {{ progress_percent }}%;"></div>
+                        </div>
+                        <span class="percent-label">{{ progress_percent }}%</span>
+                    </div>
+                </div>
+            </div>
+            
+            {% if remaining_amount == 0 %}
+            <div class="goal-celebration">
+                🎉 Goal Reached! Your kit is fully funded.
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="payment-section">
+            <h4>Payment History</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Month</th>
+                        <th>Amount Paid</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in payment_history %}
+                    <tr>
+                        <td class="month-name">{{ p.month }}</td>
+                        <td class="amount-paid">
+                            {% if p.amount %} ₹{{ p.amount }}
+                            {% else %} ₹0
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if p.status == "PAID" %}
+                                <span class="status-pill paid-tag">PAID</span>
+                            {% else %}
+                                <span class="status-pill notpaid-tag">NOT PAID</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" style="text-align: center; color: #94a3b8; padding: 50px 0;">
+                            No payments recorded yet.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </main>
+
+</body>
+</html>

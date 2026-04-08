@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coordinator Dashboard | VYMA</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-green: #1a3a32;
+            --accent-gold: #e6a026;
+            --cream-bg: #fdfaf1;
+            --success-green: #2d6a4f;
+            --error-red: #e11d48;
+            --glass-white: rgba(255, 255, 255, 0.1);
+            --light-grey: #f1f5f9;
+            --dark-grey-text: #64748b;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--cream-bg);
+            color: var(--primary-green);
+            line-height: 1.6;
+        }
+
+        /* --- DASHBOARD HEADER --- */
+        .dashboard-header {
+            background: white;
+            padding: 8px 10%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-green);
+            text-decoration: none;
+        }
+
+        .logout-btn {
+            text-decoration: none;
+            color: var(--dark-grey-text);
+            font-size: 14px;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+
+        .logout-btn:hover {
+            color: var(--error-red);
+            background: #fff1f2;
+        }
+
+        /* --- MAIN CONTENT LAYOUT --- */
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 2.5rem auto;
+            padding: 0 20px;
+        }
+
+        .header-box {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header-left h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            margin: 0;
+            color: var(--primary-green);
+        }
+        .header-left p {
+            color: var(--dark-grey-text);
+            margin: 5px 0 0 0;
+            font-size: 16px;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .area-badge {
+            background: var(--primary-green);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .area-badge::before {
+            content: '📍';
+        }
+
+        .coordinator-button {
+            background-color: var(--accent-gold);
+            color: white;
+            padding: 10px 18px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 10px rgba(230, 160, 38, 0.3);
+        }
+
+        .coordinator-button:hover {
+            background-color: #d18d1f;
+            transform: translateY(-2px);
+        }
+
+        .coordinator-button::before {
+            content: '👤';
+        }
+
+        /* --- SEARCH BAR STYLES --- */
+        .search-section {
+            margin-bottom: 2rem;
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.03);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .search-input {
+            flex-grow: 1;
+            padding: 12px 18px;
+            border: 1px solid var(--light-grey);
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: 'Inter', sans-serif;
+            color: var(--primary-green);
+            transition: border-color 0.3s ease;
+        }
+
+        .search-input::placeholder {
+            color: var(--dark-grey-text);
+            opacity: 0.7;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 0 3px rgba(230, 160, 38, 0.2);
+        }
+
+        .search-button {
+            background-color: var(--primary-green);
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .search-button:hover {
+            background-color: #122a24;
+            transform: translateY(-1px);
+        }
+
+        /* --- TABLE STYLES --- */
+        .table-card {
+            background: white;
+            border-radius: 24px;
+            padding: 35px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+            overflow-x: auto; /* Crucial for table responsiveness */
+        }
+
+        .table-card table {
+            width: 100%; /* Make table take full width of its container */
+            border-collapse: collapse;
+            min-width: 1000px; /* Ensures columns don't get too squished on larger screens */
+        }
+        .table-card th, .table-card td {
+            white-space: nowrap; /* Prevents text wrapping in cells */
+            padding: 15px 10px; /* Adjusted padding for tighter look, better for many columns */
+            text-align: center;
+        }
+        .table-card th {
+            text-align: left; /* Keep header text left-aligned where appropriate */
+            color: #94a3b8;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .table-card td {
+            border-bottom: 1px solid #f8fafc;
+            font-weight: 500;
+            font-size: 15px;
+        }
+        .table-card td:first-child,
+        .table-card td:nth-child(2) {
+            text-align: left; /* Keep ID and Name left-aligned */
+            padding-left: 0;
+        }
+
+        .total-cell {
+            font-weight: 700;
+            color: var(--primary-green);
+        }
+        .balance-cell {
+            font-weight: 700;
+            color: var(--error-red);
+        }
+
+        /* --- RESPONSIVENESS --- */
+        /* Medium screens (e.g., tablets) */
+        @media (max-width: 1024px) {
+            .dashboard-header {
+                padding: 1rem 5%;
+            }
+            .dashboard-container {
+                margin: 2rem auto;
+                padding: 0 15px;
+            }
+            .header-box {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.8rem;
+            }
+            .header-right {
+                width: 100%; /* Allow buttons/badges to take full width if wrapped */
+                justify-content: flex-start; /* Align items to start */
+            }
+            .coordinator-button, .area-badge {
+                margin-top: 0.5rem;
+            }
+        }
+        .logo-image {
+            height:65px;
+            width: auto;
+            object-fit:contain;
+        }
+
+        /* Small screens (e.g., mobile phones) */
+        @media (max-width: 768px) {
+            .dashboard-header {
+                padding: 1rem 4%;
+            }
+            .dashboard-container {
+                margin: 1.5rem auto;
+                padding: 0 10px;
+            }
+            h1 {
+                font-size: 28px;
+            }
+            .header-left p {
+                font-size: 14px;
+            }
+            .header-box {
+                gap: 0.5rem;
+            }
+            .header-right {
+                flex-direction: column;
+                align-items: stretch; /* Stretch buttons/badges to full width */
+            }
+            .coordinator-button, .area-badge {
+                 width: 100%;
+                 text-align: center;
+                 justify-content: center; /* Center content in stretched items */
+                 margin-top: 0.5rem;
+            }
+            .search-section {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 15px;
+            }
+            .search-input, .search-button {
+                width: 100%;
+            }
+            .table-card {
+                padding: 15px;
+            }
+            .table-card th, .table-card td {
+                 padding: 12px 8px; /* Further reduce padding for small screens */
+                 font-size: 13px; /* Smaller font size for table content */
+            }
+             .table-card th {
+                 font-size: 10px; /* Smaller font size for table headers */
+             }
+        }
+
+        /* Extra small screens */
+        @media (max-width: 480px) {
+            .dashboard-header {
+                padding: 0.8rem 3%;
+            }
+            h1 {
+                font-size: 24px;
+            }
+            .search-input, .search-button {
+                font-size: 14px;
+                padding: 10px 15px;
+            }
+            .coordinator-button {
+                font-size: 13px;
+                padding: 8px 15px;
+            }
+            .area-badge {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="dashboard-header">
+        <a href="/" class="logo" style="display:flex; align-items:center; gap:10px;">
+    <img src="{% static 'images/logo.png' %}" alt="VYMA" class="logo-image">
+</a>
+        <a href="{% url 'logout' %}" class="logout-btn">Logout</a> {# Make sure you have a 'logout' URL name defined #}
+    </header>
+    <div class="dashboard-container">
+
+        <div class="header-box">
+            <div class="header-left">
+                <h1>Coordinator Dashboard</h1>
+                <p>Tracking collection for members in {{ area.name }}.</p>
+            </div>
+            <div class="header-right">
+                <a href="{% url 'user_dashboard' %}" class="coordinator-button">View My User Dashboard</a>
+                <div class="area-badge">Area: {{ area.name }}</div>
+            </div>
+        </div>
+
+        {# Search Bar Form #}
+        <div class="search-section">
+            <form method="GET" action="{% url 'coordinator_dashboard' %}" style="display: flex; width: 100%; gap: 10px;">
+                <input type="text" name="search" placeholder="Search by member name..." class="search-input" value="{{ search_query }}">
+                <button type="submit" class="search-button">Search</button>
+            </form>
+        </div>
+
+        <div class="table-card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Person ID</th>
+                        <th>Member Name</th>
+                        {% for month in months %}
+                            <th>{{ month }}</th>
+                        {% endfor %}
+                        <th>Total Paid</th>
+                        <th>Balance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for m in members %}
+                    <tr>
+                        <td class="person-id">{{ m.user.person_id }}</td>
+                        <td class="member-name">{{ m.user.first_name }}</td>
+
+                        {% for amount in m.months %}
+                            <td>
+                                {% if amount %}
+                                ₹{{ amount }}
+                                {% else %}
+                                -
+                                {% endif %}
+                           </td>
+                        {% endfor %}
+
+                        <td class="total-cell">₹{{ m.total_paid }}</td>
+                        <td class="balance-cell">₹{{ m.balance }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="{{ months|length|add:4 }}" style="text-align: center; padding: 40px; color: #94a3b8;">
+                            {% if search_query %}
+                                No members found matching "{{ search_query }}" in {{ area.name }}.
+                            {% else %}
+                                No members found in this area.
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
