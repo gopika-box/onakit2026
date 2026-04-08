@@ -1,1 +1,1 @@
-web: gunicorn onakit.wsgi
+web: gunicorn onakit.wsgi:application
